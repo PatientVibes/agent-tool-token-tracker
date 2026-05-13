@@ -53,6 +53,15 @@ def test_cost_estimate_unknown_model_ignored():
     assert cost["total_usd"] == 0.0
 
 
+def test_cost_estimate_total_equals_parts_sum():
+    """total_usd must equal input_usd + output_usd exactly."""
+    t = TokenTracker()
+    t.record("a", "model-x", input_tokens=12345, output_tokens=6789)
+    t.record("b", "model-x", input_tokens=99999, output_tokens=11111)
+    cost = t.cost_estimate({"model-x": {"input": 0.37, "output": 1.23}})
+    assert cost["total_usd"] == round(cost["input_usd"] + cost["output_usd"], 6)
+
+
 def test_events_returns_copy():
     t = TokenTracker()
     t.record("a", "m", input_tokens=1, output_tokens=2)

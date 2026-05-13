@@ -73,7 +73,7 @@ class TokenTracker:
     ) -> None:
         """Record from a LangChain response message's `usage_metadata`."""
         um = getattr(raw_response, "usage_metadata", None)
-        if not um:
+        if not um:  # None or empty dict — nothing useful to record
             return
         self.record(
             source=source,
@@ -118,10 +118,12 @@ class TokenTracker:
                 continue
             in_usd += ev.input_tokens * p.get("input", 0) / 1_000_000
             out_usd += ev.output_tokens * p.get("output", 0) / 1_000_000
+        input_usd = round(in_usd, 6)
+        output_usd = round(out_usd, 6)
         return {
-            "input_usd": round(in_usd, 6),
-            "output_usd": round(out_usd, 6),
-            "total_usd": round(in_usd + out_usd, 6),
+            "input_usd": input_usd,
+            "output_usd": output_usd,
+            "total_usd": round(input_usd + output_usd, 6),
         }
 
     def events(self) -> list[TokenEvent]:
